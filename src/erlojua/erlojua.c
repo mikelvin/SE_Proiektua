@@ -21,12 +21,12 @@ int main()
 
     int timer_ticks = 3000;
     int timer_kop = TIMER_KOP;
-    printf("Clock started\n");
+    printf("Clock started1\n");
     if (pthread_create(&tr_clk, NULL, clock_start, (void *) &timer_kop)){
         printf("Error: Clock started\n");
     }
     
-    printf("Timer started\n");
+    printf("Timer started1\n");
     if (pthread_create(&tr_tmr1, NULL, timer_start, (void *) &timer_ticks)){
         printf("Error: Timer started"); 
     }
@@ -39,11 +39,12 @@ int main()
 
 
 void *clock_start(void *vargp){
-    printf("Hey im clock");
+    printf("Hey im ck2");
     int *p_timer_kop = (int *)vargp;
     int done;
     while(1){
         done = 0;
+        printf("Whilera sartu da clock");
         pthread_mutex_lock(&mutex_clk); // Mutexa blokeatu
         while ( done < *p_timer_kop )
         {
@@ -55,9 +56,11 @@ void *clock_start(void *vargp){
 }
 
 void *timer_start(void *argv){
-    printf("Timer started");
+    printf("Timer started2");
     int *count = (int *) argv;
     pthread_mutex_lock(&mutex_clk); // zer gertatuko litzateke, lerro hau clock-aren mutex-lock-a baino lehen exekutatuko balitz?
+    printf("Whilera sartu timer");
+    
     while(1){
         count--;
         if (count < 0){
