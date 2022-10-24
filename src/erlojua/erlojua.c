@@ -25,7 +25,7 @@ int main()
     if (pthread_create(&tr_clk, NULL, clock_start, (void *) &timer_kop)){
         printf("Error: Clock started\n");
     }
-    
+    sleep(5);
     printf("Timer started1\n");
     if (pthread_create(&tr_tmr1, NULL, timer_start, (void *) &timer_ticks)){
         printf("Error: Timer started"); 
@@ -44,7 +44,7 @@ void *clock_start(void *vargp){
     int done;
     while(1){
         done = 0;
-        printf("Whilera sartu da clock");
+        // printf("Whilera sartu da clock");
         pthread_mutex_lock(&mutex_clk); // Mutexa blokeatu
         while ( done < *p_timer_kop )
         {
@@ -52,14 +52,15 @@ void *clock_start(void *vargp){
             done++;
         }
         pthread_cond_broadcast(&cond_clk_ziklo);
+        pthread_mutex_unlock(&mutex_clk);
     }
 }
 
 void *timer_start(void *argv){
-    printf("Timer started2");
+    // printf("Timer started2");
     int *count = (int *) argv;
     pthread_mutex_lock(&mutex_clk); // zer gertatuko litzateke, lerro hau clock-aren mutex-lock-a baino lehen exekutatuko balitz?
-    printf("Whilera sartu timer");
+    // printf("Whilera sartu timer");
     
     while(1){
         count--;
