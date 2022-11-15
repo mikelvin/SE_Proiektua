@@ -1,7 +1,8 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <sheduler_s.h>
 #include <pthread.h>
-#include <linked_list_s.h>
+#include <lnklist_s.h>
 #include <pcb_s.h>
 
 void sched_AddToProcessQueue(sched_basic_t * sched, pcb_t * new_pcb){
@@ -15,10 +16,12 @@ void sched_Schedule(sched_basic_t * sched){
     next_process = sched_GetNextFromProcessQueue(sched);
     old_process = sched->current_running_process;
 
-    sched->current_running_process = next_process;
-    disp_Dispatch(next_process, old_process);
-    
-    sched_AddToProcessQueue(sched, old_process);
+    if (next_process != NULL){
+        sched->current_running_process = next_process;
+        disp_Dispatch(next_process, old_process);
+
+        sched_AddToProcessQueue(sched, old_process);
+    }
 }
 
 pcb_t * sched_GetNextFromProcessQueue(sched_basic_t * sched){
@@ -50,7 +53,49 @@ sched_basic_t * sched_struct_create_and_init(){
     // Prozesu nulua
     pcb_t * null_process = (pcb_t *) malloc(sizeof(pcb_t));
     nire_sched->current_running_process = null_process; 
-
     return nire_sched;
+}
+
+void prgen_init(pr_gen_t *prgen, sched_basic_t * sched, int max_PID, int min_PID){
+    prgen->MAX_PID = max_PID;
+    prgen->MIN_PID = min_PID;
+    prgen->scheduler = sched;
+    prgen->current_counter = 0;
+}
+
+int _prgen_getValidPid(pr_gen_t * pr_gen){
+    //TODO: Frogatu scheduler-ean pid hori jada esleituta dagoen ala ez
+    int new_pr_id;
+    new_pr_id = rand() % (pr_gen->MAX_PID-pr_gen->MIN_PID) + pr_gen->MIN_PID;
+    return new_pr_id;
+}
+
+void prgen_generate(pr_gen_t * pr_gen){
+    printf("Process generator called: ");
+
+    pcb_t * new_process_pcb;
+    new_process_pcb = (pcb_t *) malloc(sizeof(pcb_t));
+
+    new_process_pcb->pid = _prgen_getValidPid(pr_gen);
+
+    sched_AddToProcessQueue(pr_gen->scheduler, new_process_pcb);
+}
+
+void sched_print_sched_State(sched_basic_t * sched){
+    pthread_mutex_lock(sched->sched_list_mutex);
+
+    printf("Scheduler Info:\n");
+    printf("- Process list len = %d \n", sched->pr_l->len);
+    printf("- Process pids = NEXT -> [ ");
+    struct lnk_node * pr;
+    for(pr = sched->pr_l->first; pr != NULL;  pr = pr->next){
+        pcb_t * current = (pcb_t *) pr->data;
+        printf("%d ", current->pid);
+    }
+    printf("]\n");
+
+    printf("- Current process = %d \n", sched->current_running_process->pid);
+
+    pthread_mutex_unlock(sched->sched_list_mutex);
 }
 

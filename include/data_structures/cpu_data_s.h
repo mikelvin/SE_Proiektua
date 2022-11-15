@@ -21,6 +21,4 @@ int core_t_init(struct core_s * p_core, int hari_num);
 
 int hari_t_init(struct core_hari_s * p_hari);
 
-int get_hari(struct cpu_s * p_cpu, int core_id, int hari_id);
-
 #endif

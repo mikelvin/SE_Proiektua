@@ -1,7 +1,7 @@
 // PCB:
 #include <stdlib.h>
 #include <stdio.h>
-#include <linked_list_s.h>
+#include <lnklist_s.h>
 
 
 void *lnklst_LFRL_pop(lnklist_LFRL * p_list){

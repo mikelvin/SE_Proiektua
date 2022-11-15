@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <linked_list_s.h>
+#include <lnklist_s.h>
 #include <pcb_s.h>
 
 

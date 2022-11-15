@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <linked_list_s.h>
+#include <lnklist_s.h>
 #include <clk_s.h>
 
 void *clock_start(void *clk_mutex_s){
@@ -32,7 +32,8 @@ void *timer_start(void *p_timer_s){
     
     while(1){
         count -= 1;
-        printf("TMR: count %d \n", count);
+        printf("TMR_f%d: count %d \n",tmr->tmr_tick_freq, count);
+        
         if (count <= 0){
             tmr->TickAction(tmr->tickActionParams);
             count = tmr->tmr_tick_freq;
