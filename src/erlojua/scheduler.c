@@ -11,7 +11,7 @@ void sched_AddToProcessQueue(sched_basic_t * sched, pcb_t * new_pcb){
     pthread_mutex_unlock(sched->sched_list_mutex);
 }
 
-void sched_Schedule(sched_basic_t * sched){
+void sched_Scheduler_Dispatcher(sched_basic_t * sched){
     pcb_t * next_process, * old_process;
     next_process = sched_GetNextFromProcessQueue(sched);
     old_process = sched->current_running_process;

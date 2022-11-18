@@ -2,7 +2,7 @@
 TARGET_EXEC := a.out
 
 BUILD_DIR := ./build
-SRC_DIRS := ./src
+SRC_DIRS := ./src ./include
 INC_ROOT_DIR := ./include
 
 # Find all the C and C++ files we want to compile

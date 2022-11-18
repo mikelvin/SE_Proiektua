@@ -51,7 +51,7 @@ int main()
     struct timer_s tmr1 = {
         .linked_clk = &clkm_1, 
         .tmr_tick_freq = SCHEDULER_FREQUENCY, 
-        .TickAction=&sched_Schedule, 
+        .TickAction=&sched_Scheduler_Dispatcher, 
         .tickActionParams=my_scheduler};
     if (pthread_create(&tr_tmr1, NULL, timer_start, (void *) &tmr1)){
         printf("Error: Timer started\n"); 
