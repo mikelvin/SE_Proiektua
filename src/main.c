@@ -6,69 +6,63 @@
 #include <lnklist_s.h>
 #include <clk_s.h>
 #include <pcb_s.h>
-#include <sheduler_s.h>
+#include <scheduler_s.h>
 #include <cpu_data_s.h>
+#include <prgenerator.h>
+#include <schedp_prio_fifo.h>
 
 #define TIMER_KOP   3 
-#define SCHEDULER_FREQUENCY   10 
-#define PROCESSGEN_FREQUENCY   5 
-#define EGOERA_PRINT_FREQUENCY 5
+#define SCHEDULER_FREQUENCY  2
+#define PROCESSGEN_FREQUENCY   4 
+#define EGOERA_PRINT_FREQUENCY 1
 
 #define PRGEN_MAX_PID 1
 #define PRGEN_MIN_PID 1000
 
 
-pthread_mutex_t g_mutex_clk = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t g_cond_clk_ziklo = PTHREAD_COND_INITIALIZER;
-pthread_cond_t g_cond_tmr_arreta = PTHREAD_COND_INITIALIZER;
-
-struct clk_mutex_s clkm_1 = {
-        .mutex_clk = &g_mutex_clk,
-        .cond_clk_ziklo = &g_cond_clk_ziklo,
-        .cond_tmr_arreta = &g_cond_tmr_arreta,
-        .tmr_kop_tick_consumed = 0,
-        .tmr_total_kop = TIMER_KOP
-    };
-
+struct clk_clock_s clkm_1;
 
 int main()
 { 
-
-    pthread_t tr_clk, tr_tmr1, tr_tmr2_prgen, tr_tmr_print;
-
-    sched_basic_t * my_scheduler;
-    my_scheduler = sched_struct_create_and_init();
+    clk_timer_s tmr1_scheduler;
+    clk_timer_s tmr2_prgen;
+    clk_timer_s debug_tmr3_print_pqueue;
+    pthread_t tr_clk, tr_tmr1_sched, tr_tmr2_prgen, tr_tmr_print;
 
     pr_gen_t my_pr_generator;
-    prgen_init(&my_pr_generator, my_scheduler, PRGEN_MAX_PID, PRGEN_MIN_PID);
+    sched_basic_t my_scheduler;
 
-    int timer_kop = TIMER_KOP;
+    clk_clock_init(&clkm_1);
+    
+    clk_timer_init(&tmr1_scheduler,&clkm_1, 
+        SCHEDULER_FREQUENCY, sched_Scheduler_Dispatcher, &my_scheduler);
+    clk_timer_init(&tmr2_prgen,&clkm_1, 
+        PROCESSGEN_FREQUENCY,&prgen_generate,&my_pr_generator);
+    clk_timer_init(&debug_tmr3_print_pqueue, &clkm_1, 
+        EGOERA_PRINT_FREQUENCY, &sched_print_sched_State, &my_scheduler);
+
+    
+    
+    sched_init(&my_scheduler, &tmr1_scheduler, MY_SCHED_PRIO_RR);
+    prgen_init(&my_pr_generator, &my_scheduler, PRGEN_MAX_PID, PRGEN_MIN_PID, MAX_PRIO);
+
+      
+    if (pthread_create(&tr_tmr1_sched, NULL, clk_timer_start, (void *) &tmr1_scheduler))
+        printf("Error: Timer started\n"); 
+    
+    if (pthread_create(&tr_tmr2_prgen, NULL, clk_timer_start, (void *) &tmr2_prgen))
+        printf("Error: Timer started\n"); 
+    
+    if (pthread_create(&tr_tmr_print, NULL, clk_timer_start, (void *) &debug_tmr3_print_pqueue))
+        printf("Error: Timer started\n"); 
+    
     printf("Clock execute\n");
-    if (pthread_create(&tr_clk, NULL, clock_start, (void *)  &clkm_1)){
+    if (pthread_create(&tr_clk, NULL, clk_clock_start, (void *)  &clkm_1))
         printf("Error: Clock started\n");
-    }
     
-    struct timer_s tmr1 = {
-        .linked_clk = &clkm_1, 
-        .tmr_tick_freq = SCHEDULER_FREQUENCY, 
-        .TickAction=&sched_Scheduler_Dispatcher, 
-        .tickActionParams=my_scheduler};
-    if (pthread_create(&tr_tmr1, NULL, timer_start, (void *) &tmr1)){
-        printf("Error: Timer started\n"); 
-    }
 
-    struct timer_s tmr2_prgen = {.linked_clk = &clkm_1, .tmr_tick_freq = PROCESSGEN_FREQUENCY, .TickAction=&prgen_generate, .tickActionParams=&my_pr_generator};
-    if (pthread_create(&tr_tmr2_prgen, NULL, timer_start, (void *) &tmr2_prgen)){
-        printf("Error: Timer started\n"); 
-    }
-
-    struct timer_s tmr3 = {.linked_clk = &clkm_1, .tmr_tick_freq = EGOERA_PRINT_FREQUENCY, .TickAction=&sched_print_sched_State, .tickActionParams=my_scheduler};
-    if (pthread_create(&tr_tmr_print, NULL, timer_start, (void *) &tmr3)){
-        printf("Error: Timer started\n"); 
-    }
-    
--    pthread_join(tr_clk, NULL);
-    //pthread_join(tr_tmr1, NULL); 
+-   pthread_join(tr_clk, NULL);
+     
     
     exit(0);
 }
