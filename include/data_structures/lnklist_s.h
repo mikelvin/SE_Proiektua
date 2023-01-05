@@ -70,6 +70,12 @@ void *lnklst_LFRL_pop(lnklist_LFRL * p_list);
 */
 void lnklst_LFRL_push(lnklist_LFRL * p_list, void * p_data);
 
+void * lnklst_LFRL_peek(lnklist_LFRL * p_list);
+
+int lnklst_LFRL_len(lnklist_LFRL * p_list);
+
+int _lnklst_LFRL_notEmpty(lnklist_LFRL * p_list);
+
 void lnklst_LFRL_init(lnklist_LFRL * p_list);
 
 #endif

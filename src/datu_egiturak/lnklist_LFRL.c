@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <lnklist_s.h>
+#include <stdbool.h>
 
 
 void *lnklst_LFRL_pop(lnklist_LFRL * p_list){
@@ -34,6 +35,29 @@ void *lnklst_LFRL_pop(lnklist_LFRL * p_list){
     return last_item;
 }
 
+void * lnklst_LFRL_peek(lnklist_LFRL * p_list){
+    if(!_lnklst_LFRL_notEmpty(p_list)){
+        return NULL;
+    }
+
+    return p_list->first->data;
+}
+
+int lnklst_LFRL_len(lnklist_LFRL * p_list){
+    return p_list->len;
+}
+
+int _lnklst_LFRL_notEmpty(lnklist_LFRL * p_list){
+    if (!p_list){
+        // Listarik pasatzen ez bada
+        return false; 
+    }
+    if(p_list->len == 0){
+        return true;
+    }else{
+        return false;
+    }
+}
 
 void lnklst_LFRL_push(lnklist_LFRL * p_list, void * p_data){
     if (!p_list){
@@ -63,6 +87,8 @@ void lnklst_LFRL_push(lnklist_LFRL * p_list, void * p_data){
     p_list->last = n_berri;
     p_list->len++;
 }
+
+
 
 void lnklst_LFRL_init(lnklist_LFRL * p_list){
     p_list->first = NULL;
