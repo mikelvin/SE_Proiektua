@@ -76,6 +76,9 @@ int lnklst_LFRL_len(lnklist_LFRL * p_list);
 
 int _lnklst_LFRL_notEmpty(lnklist_LFRL * p_list);
 
+void * lnklst_LFRL_popFirstMatchFromRear(lnklist_LFRL * p_list, int (* predicate)    (void * data, void * args), void * s_args);
+void * lnklst_LFRL_peekFirstMatchFromRear(lnklist_LFRL * p_list, int  (* predicate)  (void * data, void * args), void * s_args);
+
 void lnklst_LFRL_init(lnklist_LFRL * p_list);
 
 #endif
