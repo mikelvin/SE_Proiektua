@@ -79,6 +79,10 @@ int _lnklst_LFRL_notEmpty(lnklist_LFRL * p_list);
 void * lnklst_LFRL_popFirstMatchFromRear(lnklist_LFRL * p_list, int (* predicate)    (void * data, void * args), void * s_args);
 void * lnklst_LFRL_peekFirstMatchFromRear(lnklist_LFRL * p_list, int  (* predicate)  (void * data, void * args), void * s_args);
 
+void *lnklst_LFRL_nodeIterator(lnklist_LFRL *p_list, void (*precessor)(struct lnk_node *data, void *s_args), void *args);
+
 void lnklst_LFRL_init(lnklist_LFRL * p_list);
+
+int __unlink_procedure_of_current(lnklist_LFRL * p_list, struct lnk_node * prev, struct lnk_node * current);
 
 #endif

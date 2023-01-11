@@ -179,3 +179,14 @@ void * lnklst_LFRL_peekFirstMatchFromRear(lnklist_LFRL * p_list, int  (* predica
     return out_data;
 }
 
+void *lnklst_LFRL_nodeIterator(lnklist_LFRL *p_list, void (*precessor)(struct lnk_node *data, void *s_args), void *args)
+{
+    struct lnk_node * current = p_list->first;
+    int match_found = 0;
+    while(current){ // Mientras que no se termine la lista y no se hayan producido matches
+        precessor(current, args);
+        current = current->next;
+    }
+}
+
+
