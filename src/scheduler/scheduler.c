@@ -50,8 +50,8 @@ void sched_Scheduler_Dispatcher(sched_basic_t * sched){
 
         // OLD_PROCESS ez bada NULL_PROCESS edo Amaitu behar duen prozesua
         if(sched->current_sched_status != NULL_PROCESS_RUN){
-            if(old_process->status == PR_FINI){
-                disp_Terminate(old_process);
+            if(old_process->status == PR_FINI){ // 
+                disp_Terminate(old_process); 
             }else{
                 sched_AddToProcessQueue(sched, old_process);
             }
@@ -60,7 +60,7 @@ void sched_Scheduler_Dispatcher(sched_basic_t * sched){
     }else{
         printf("- Next: Keep last");
     }
-    printf(" - comparation %d and %d\n", next_process, &sched->null_process);
+    printf(" - comparation %d and %d\n", (unsigned int) next_process, (unsigned int) &sched->null_process);
 
     // NUEVO ESTADO DE SCHEDULER
     // Configurar nuevo estado de scheduler:

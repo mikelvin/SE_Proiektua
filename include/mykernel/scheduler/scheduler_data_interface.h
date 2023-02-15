@@ -36,6 +36,6 @@ void i_schedImplement(
     char * (* print) (void * sched_data)
     );
 
-void i_schedStartup(s_i_sched * ifaceo, int POLICY);
+void i_schedStartup(s_i_sched * ifaceo, int POLICY);// TODO: Change name to: i_schedConfigure
 
 #endif
