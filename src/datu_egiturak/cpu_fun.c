@@ -44,6 +44,8 @@ int core_t_init(struct core_s * p_core, int hari_num){
     return 0;
 }
 
-int hari_t_init(struct core_hari_s * p_hari){
-    p_hari->pid=0;
+int hari_t_init(struct core_hari_s * p_hari){ //TODO: Añadir mas parametros 
+    p_hari->IR=0;
 }
+
+
