@@ -55,13 +55,13 @@ struct free_block{
 };
 
 struct pte{ // Page Table Entry
-    uint32_t ptbr;
     uint32_t virtual_adress;
     uint32_t physycal_adress;
+    uint8_t active;
 };
 
 struct mmu{
-    lnklist_LFRL tlb;
+    struct pte * tlb_hashArr;
     int tlb_max_space;
     struct physycal_memory * ps;
 };

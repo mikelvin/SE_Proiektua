@@ -188,7 +188,6 @@ int  pm_pt_page_table_free(struct physycal_memory * ps, uint32_t adress){
         pm_m_frame_free(ps, pm_read_word(ps, current_pte_adress)); // TODO: POSIBLE FUTURO BUG Si se puede cambiar dinamicamente el tamaño de cada entrada de la page table (en este caso 4 bytes) --> entonces se deberia poder leer un numero de bytes determinado usando esta funcion y no solo word
         current_pte_adress = current_pte_adress + PAGETABLE_ENTRY_ADRESS_KOP;
     }
-
     return 1;
 }
 
@@ -292,18 +291,6 @@ int __optimize_free_block_list(struct physycal_memory * ps){
     return 1;
 }
 
-
-int __predicate_pte_match(void *data, void *args){
-    struct pte * match_virt_adress =  (struct pte * ) args;
-    struct pte * current_pte =  (struct pte *) data;
-
-    if (current_pte->ptbr == match_virt_adress->ptbr){
-        return (match_virt_adress->virtual_adress & ~(FRAME_OFSET_MASK)) == (current_pte->virtual_adress & ~(FRAME_OFSET_MASK));
-    }else{
-        return 0;
-    }
-}
-
 uint32_t mmu_resolve(struct mmu * p_mmu, uint32_t PTBR, uint32_t virt_adress){
     struct pte * pte_match;
     uint32_t frame_adress;
@@ -334,28 +321,37 @@ int  mmu_resolve_frame_rootadr_from_memo(struct mmu * p_mmu, uint32_t * frame_ad
 }
 
 int tlb_get_match(struct mmu * p_mmu, struct pte ** match_pte, uint32_t ptbr, uint32_t virt_adress){
-    struct pte matching_pte = {.physycal_adress = 0, .ptbr = ptbr, .virtual_adress = virt_adress};
+    struct pte * potential_pte;
 
-    *match_pte = (struct pte *) lnklst_LFRL_peekFirstMatchFromRear(&p_mmu->tlb,__predicate_pte_match, &matching_pte);
-    if(!*match_pte){
+    uint32_t page_number = virt_adress >> FRAME_OFSET_BITS;
+    int hash = page_number % p_mmu->tlb_max_space;
+    potential_pte  = &p_mmu->tlb_hashArr[hash];
+    * match_pte = NULL;
+    if(potential_pte->active && (potential_pte->virtual_adress & ~(FRAME_OFSET_MASK)) == (virt_adress & ~(FRAME_OFSET_MASK))){
+        * match_pte = potential_pte;
+        return 1;
+    }else{
         return 0;
     }
-
-    return 1;
 }
 
 int tlb_add_entry(struct mmu * p_mmu, uint32_t ptbr, uint32_t virt_adr, uint32_t phys_adr){
-    struct pte * new_pte;
-    new_pte = (struct pte *)  malloc(sizeof(struct pte));
-    new_pte->physycal_adress = phys_adr;
-    new_pte->virtual_adress = virt_adr;
-    new_pte->ptbr = ptbr;
+    uint32_t page_number = virt_adr >> FRAME_OFSET_BITS;
+    int hash = page_number % p_mmu->tlb_max_space;
+    struct pte * new_pte = &p_mmu->tlb_hashArr[hash];
+    new_pte->active = 1;
+    new_pte->physycal_adress = phys_adr & ~(FRAME_OFSET_MASK);
+    new_pte->virtual_adress = virt_adr & ~(FRAME_OFSET_MASK);
+}
 
-    if(lnklst_LFRL_len(&p_mmu->tlb) >= TLB_SIZE){
-        free(lnklst_LFRL_pop(&p_mmu->tlb));
-    }
-    lnklst_LFRL_push(&p_mmu->tlb, new_pte);
-    return 1;
+int tlb_flush(struct mmu * p_mmu){
+    struct pte * current_pte;
+    for(int i = 0; i < p_mmu->tlb_max_space; i++){
+        current_pte = &p_mmu->tlb_hashArr[i];
+        current_pte->active = 0;
+        current_pte->physycal_adress = 0;
+        current_pte->virtual_adress = 0;
+    } 
 }
 
 
@@ -369,7 +365,8 @@ int pmemo_init(struct physycal_memory * pm){
 }
 
 int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_space){
-    lnklst_LFRL_init(&target_mmu->tlb);
+    target_mmu->tlb_hashArr = (struct pte *) malloc(sizeof(struct pte)*max_tlb_space);
+    for(int i = 0; i < target_mmu->tlb_max_space; i++) target_mmu->tlb_hashArr[i].active = 0;
     target_mmu->tlb_max_space = max_tlb_space;
     target_mmu->ps = pm;
 }

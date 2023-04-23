@@ -74,7 +74,7 @@ void sched_Scheduler_Dispatcher(sched_basic_t * sched, struct sched_cpuThreadCon
         // OLD_PROCESS ez bada NULL_PROCESS edo Amaitu behar duen prozesua
         if(thr_control->current_cpu_SchedStatus != NULL_PROCESS_RUN){
             if(old_process->status == PR_FINI){ // 
-                disp_Terminate(old_process); 
+                disp_Terminate(thr_control->core_hari_s, old_process); 
             }else{
                 sched_AddToProcessQueue(sched, old_process);
                 old_process->status = PR_READY;
@@ -98,7 +98,6 @@ void sched_Scheduler_Dispatcher(sched_basic_t * sched, struct sched_cpuThreadCon
     }
     
     printf("current sheduler status: %d", sched->current_sched_status);
-
 }
 
 /**
