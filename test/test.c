@@ -1,14 +1,14 @@
-struct Item {
-    int size;
-};
-
-typedef struct Item Item;
-
+/*int fun(int itmarr[]);
 int main(){
-    Item item[10];
-    
+    int itms[] = {1,2,3,4,5};
+
+    fun(&itms);
+
+    for(int i = 0; i<5;i++){
+        printf("%d ",itms[i]);
+    }
 };
 
-int getIndexOfItemArray(Item itmarr[]){
-
-}
+int fun(int itmarr[]){
+    itmarr[0] = 20;
+}*/

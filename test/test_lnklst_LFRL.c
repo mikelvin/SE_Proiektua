@@ -3,7 +3,7 @@
 #include <pcb_s.h>
 
 
-int main(){
+/* int main(){
     struct pcb_t m_pcb1 = {.pid = 10};
     struct pcb_t m_pcb2 = {.pid = 11};
 
@@ -21,4 +21,4 @@ int main(){
 
     printf("PID: %d \n", m_pcb2_pntr1->pid );
     printf("PID: %d \n", m_pcb2_pntr2->pid );
-}
+} */

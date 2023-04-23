@@ -3,14 +3,48 @@
 
 #include "executor.h"
 
+/**
+ * @brief item aldagaiaren zati bat lortu. Zati hauek adierazteko, nibble (4 bit) tarte bat adieraziko da.
+ * Tarte honen goi zein behe mugak barne kontuan hartuko dira.
+ * 
+ * @param item 
+ * @param leftmost_nibble 
+ * @param rightmost_nibble 
+ * @return uint32_t 
+ */
 uint32_t getNibbleRange(uint32_t item, int leftmost_nibble, int rightmost_nibble){
     item = item >> rightmost_nibble * 4;
     item = item & ((1 << (4 + (leftmost_nibble - rightmost_nibble)*4)) - 1);
     return item;
 }
+int executor_init(executor_t * exec, cpu_s cpu_arr[], int cpu_arr_len){
+    exec->cpu_arr = cpu_arr;
+     exec->cpu_arr_len = cpu_arr_len;
+}
+
+void executor_exec(executor_t * exec){
+    execute_all(exec->cpu_arr, exec->cpu_arr_len);
+}
+
+int execute_all(cpu_s cpu_arr[], int cpu_arr_len){
+    for(int i = 0; i < cpu_arr_len; i++)
+    {
+        int current_core_kop = cpu_arr[i].core_kant;
+        struct core_s ** current_core_arr = cpu_arr[i].core_arr;
+        for(int j = 0; j < current_core_kop; j++)
+        {
+            int current_hari_kop = current_core_arr[j]->hari_kant;
+            for(int k = 0 ; k < current_hari_kop; k++)
+            {
+                execute_current(current_core_arr[j]->hari_arr[k]);
+            }
+        }
+    } 
+}
 
 int execute_current(struct core_hari_s * cpu_context){
-    uint32_t plain_command = mmu_resolve(&cpu_context->mem_manag_unit, cpu_context->PTBR, cpu_context->PC);
+    uint32_t plain_command_adress = mmu_resolve(&cpu_context->mem_manag_unit, cpu_context->PTBR, cpu_context->PC);
+    uint32_t plain_command = pm_read_word(cpu_context->mem_manag_unit.ps, plain_command_adress);
     cpu_context->IR = plain_command;
     return __execute(cpu_context, plain_command);
 }
@@ -27,29 +61,29 @@ int __execute(struct core_hari_s * cpu_context, uint32_t plain_command){
     
     switch (command)
     {
-    case 0:  // ld
-    case 1:  // st
+    case OP_LD:  // ld
+    case OP_ST:  // st
+        cpu_context->PC = cpu_context->PC + PC_INCREMENT;
         __ex_MEM(cpu_context, plain_command);
-        cpu_context->PC = cpu_context->PC + PC_INCREMENT;
         break;
-    case 2:  // add
-    case 3:  // sub
-    case 4:  // mul
-    case 5:  // div
-    case 6:  // and
-    case 7:  // or
-    case 8:  // xor
-    case 9:  // mov
-    case 10: // cmp
+    case OP_ADD:
+    case OP_SUB:
+    case OP_MUL:
+    case OP_DIV:
+    case OP_AND:
+    case OP_OR:
+    case OP_XOR:
+    case OP_MOV:
+    case OP_CMP:
+        cpu_context->PC = cpu_context->PC + PC_INCREMENT;
         __ex_ALU(cpu_context, plain_command);
-        cpu_context->PC = cpu_context->PC + PC_INCREMENT;
         break;
-    
-    case 11: //b
-    case 12: //beq
-    case 13: //bgt
-    case 14: //blt
-    case 15: //exit
+    case OP_B: 
+    case OP_BEQ:
+    case OP_BGT: 
+    case OP_BLT: 
+        cpu_context->PC = cpu_context->PC + PC_INCREMENT;
+    case OP_EXIT: 
         __ex_CU(cpu_context, plain_command);
         break;
     default:

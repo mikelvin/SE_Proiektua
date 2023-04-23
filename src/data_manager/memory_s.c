@@ -12,7 +12,8 @@ uint32_t pm_read_word(struct physycal_memory * ps, uint32_t phys_adress){
     uint32_t data = 0x0;
     for(int byte_i = 0; byte_i < BUS_DATA_BYTES_SIZE; byte_i++){
         data = data << DATA_CELL_STORE_BYTES*8;
-        data = data | ps->memory[word_start_adress + byte_i];
+        uint8_t current_byte = ps->memory[word_start_adress + byte_i];
+        data = data | (current_byte & 0xFF);
     }
 
     return data;
@@ -227,10 +228,10 @@ int __pm_memory_allocation_procedure(struct physycal_memory * ps, struct free_bl
     }
 
     // Actualiza el bloque
-    fb->start_adress = start_resulting_adress - request->min_adress_kont;
-    if(fb->start_adress - fb->end_adress == 0){
+    fb->start_adress = start_resulting_adress + request->min_adress_kont;
+    if(fb->end_adress - fb->start_adress == 0){
         free(fb);
-    }else if(fb->start_adress - fb->end_adress > 0){
+    }else if(fb->end_adress - fb->start_adress > 0){
         lnklst_LFRL_push(&ps->free_blocks, (void *) fb);
     }else{
         return 0;
@@ -346,6 +347,9 @@ int tlb_get_match(struct mmu * p_mmu, struct pte ** match_pte, uint32_t ptbr, ui
 int tlb_add_entry(struct mmu * p_mmu, uint32_t ptbr, uint32_t virt_adr, uint32_t phys_adr){
     struct pte * new_pte;
     new_pte = (struct pte *)  malloc(sizeof(struct pte));
+    new_pte->physycal_adress = phys_adr;
+    new_pte->virtual_adress = virt_adr;
+    new_pte->ptbr = ptbr;
 
     if(lnklst_LFRL_len(&p_mmu->tlb) >= TLB_SIZE){
         free(lnklst_LFRL_pop(&p_mmu->tlb));
@@ -356,7 +360,12 @@ int tlb_add_entry(struct mmu * p_mmu, uint32_t ptbr, uint32_t virt_adr, uint32_t
 
 
 int pmemo_init(struct physycal_memory * pm){
-    lnklst_LFRL_init(&pm->free_blocks);
+    pm->memory= (char *) malloc (sizeof(char)*BUS_ADRESS_SPACE);
+    lnklst_LFRL_init(&(pm->free_blocks));
+    struct free_block * root_freeBlock = ( struct free_block *) malloc(sizeof(struct free_block));
+    root_freeBlock->start_adress= ALL_MEMO_SPACE_START_ADRESS;
+    root_freeBlock->end_adress= ALL_MEMO_SPACE_END_ADRESS;
+    lnklst_LFRL_push(&(pm->free_blocks),(void *) root_freeBlock);
 }
 
 int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_space){
@@ -373,3 +382,7 @@ int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop){
     return pm_pt_page_table_malloc(target_mmu->ps, ptbr, frames_needed);
 }
 
+int mmu_free(struct mmu * target_mmu, uint32_t * ptbr){
+    pm_pt_page_table_free(target_mmu->ps, ptbr);
+    
+}

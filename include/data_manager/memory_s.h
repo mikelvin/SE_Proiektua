@@ -2,6 +2,7 @@
 #ifndef MEMORIA_H
 #define MEMORIA_H
 
+// define BUS_BIT_SIZE 24
 # define BUS_BIT_SIZE 24
 # define BUS_ADRESS_SPACE (1<<BUS_BIT_SIZE)
 
@@ -30,17 +31,21 @@
 # define DATA_CELL_STORE_BITS  DATA_CELL_STORE_BYTES*8
 
 
+
 # define KERNEL_SPACE_START_ADDRESS 0x000000
 # define KERNEL_SPACE_END_ADDRESS 0x3FFFFF
 # define MEMO_SPACE_START_ADDRESS 0x400000
 # define MEMO_SPACE_END_ADDRESS 0xFFFFFF
+
+# define ALL_MEMO_SPACE_START_ADRESS KERNEL_SPACE_START_ADDRESS
+# define ALL_MEMO_SPACE_END_ADRESS MEMO_SPACE_END_ADDRESS
 
 
 # include <stdint.h>
 # include <lnklist_s.h>
 
 struct physycal_memory {
-    char memory[BUS_ADRESS_SPACE];
+    char * memory;
     lnklist_LFRL free_blocks;
 };
 
@@ -114,6 +119,10 @@ uint32_t mmu_resolve(struct mmu * p_mmu, uint32_t PTBR, uint32_t virt_adress);
 */
 int  mmu_resolve_frame_rootadr_from_memo(struct mmu * p_mmu, uint32_t * frame_adress, uint32_t PTBR, uint32_t virt_adress);
 // 
+
+int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop);
+int mmu_free(struct mmu * target_mmu, uint32_t * ptbr);
+int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_space);
 
 
 int tlb_get_match(struct mmu * p_mmu, struct pte ** match_pte, uint32_t ptbr, uint32_t virt_adress);

@@ -4,3 +4,6 @@ build
 data
 *.zip
 documentation/project_files
+libs
+c-logger-0.4.1
+*.elf
