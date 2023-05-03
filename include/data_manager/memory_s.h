@@ -126,9 +126,8 @@ int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_s
 
 
 int tlb_get_match(struct mmu * p_mmu, struct pte ** match_pte, uint32_t ptbr, uint32_t virt_adress);
-
 int tlb_add_entry(struct mmu * p_mmu, uint32_t ptbr, uint32_t virt_adr, uint32_t phys_adr);
-
+int tlb_flush(struct mmu * p_mmu);
 
 /*
     KERNEL SPACE:

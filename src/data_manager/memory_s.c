@@ -183,7 +183,7 @@ int  pm_pt_page_table_free(struct physycal_memory * ps, uint32_t adress){
     new_fb->end_adress = table_start_adress + PAGETABLE_CORE_ADRESS_KOP + PAGETABLE_ENTRY_ADRESS_KOP * entries;
     lnklst_LFRL_push(&ps->free_blocks, (void *) new_fb);
 
-    uint32_t current_pte_adress =  PAGETABLE_CORE_ADRESS_KOP;
+    uint32_t current_pte_adress = table_start_adress + PAGETABLE_CORE_ADRESS_KOP;
     for(int i = 0; i < entries; i++){
         pm_m_frame_free(ps, pm_read_word(ps, current_pte_adress)); // TODO: POSIBLE FUTURO BUG Si se puede cambiar dinamicamente el tamaño de cada entrada de la page table (en este caso 4 bytes) --> entonces se deberia poder leer un numero de bytes determinado usando esta funcion y no solo word
         current_pte_adress = current_pte_adress + PAGETABLE_ENTRY_ADRESS_KOP;
@@ -366,9 +366,10 @@ int pmemo_init(struct physycal_memory * pm){
 
 int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_space){
     target_mmu->tlb_hashArr = (struct pte *) malloc(sizeof(struct pte)*max_tlb_space);
-    for(int i = 0; i < target_mmu->tlb_max_space; i++) target_mmu->tlb_hashArr[i].active = 0;
     target_mmu->tlb_max_space = max_tlb_space;
     target_mmu->ps = pm;
+
+    for(int i = 0; i < target_mmu->tlb_max_space; i++) target_mmu->tlb_hashArr[i].active = 0;
 }
 
 int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop){

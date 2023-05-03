@@ -95,7 +95,7 @@ int __unlink_procedure_of_current(lnklist_LFRL * p_list, struct lnk_node * prev,
     if(!current)
         return 0;
     if(prev)
-        assert(prev->next != current);
+        assert(prev->next == current);
 
     if(current == p_list->first){
         assert(!prev);

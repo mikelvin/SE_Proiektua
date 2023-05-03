@@ -63,6 +63,9 @@ int loader_startup(loader_s * loader, struct physycal_memory * pm, sched_basic_t
         }
         closedir(d);
     }
+
+    MergeSort(&loader->unloaded_elf_list, strcmp);
+
     return(0);
 }
 
@@ -93,14 +96,14 @@ int loader_loadNextProcess(loader_s * loader)
  * @return int 
  */
 int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
-{
+ {
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
     size_t read;
-
+    printf("%s",d_name);
     fp = fopen(d_name, "r");
-    if (fp == NULL){
+    if (fp == NULL){ // Fitxategia ireki
         exit(1);
         return 0;
     }
@@ -113,10 +116,10 @@ int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
         return 0;
     }
 
+    //Memoria erreserbatu programak dituen lerroen (agindu zein datuen) arabera
     mmu_malloc(p_mmu, &loading_pcb->memo_m.pgb, line_numb-2);
     
-    // Lehenengo 2 lerroak prozesatu
-
+    // Lehenengo 2 lerroak prozesatu: Header-ak
     for(int i = 0; i < 2; i++){
         //Line 1: .text XXXXXX
         read = getline(&line, &len, fp);  // .text XXXXXX /r/n
@@ -135,7 +138,7 @@ int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
     // Geratzen den programaren edukia kargatu
     uint32_t virt_adress = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
-         //printf("Retrieved line %d of length %zu:\n",line_numb, read);
+        //printf("Retrieved line %d of length %zu:\n",line_numb, read);
         //printf("%s", line);
         uint32_t current_data = 0;
         line[strcspn(line, "\r\n")] = 0;
@@ -147,10 +150,18 @@ int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
     }
 
     fclose(fp);
-
+    tlb_flush(p_mmu); // MMU-aren interfazea erabiltzen denez, honen TLB-a garbitu behar da 
     return 1;
 }
 
+/**
+ * @brief Prozesu nulu berri bat sortzen eta kargatzen du memorian. Prozezu honen informazioa parametro
+ * bitartez zehaztutako pcb-arekin lotzen du
+ * 
+ * @param p_mmu 
+ * @param loading_pcb 
+ * @return int 
+ */
 int loadNullPCB(struct mmu * p_mmu, struct pcb_str * loading_pcb){
     
     mmu_malloc(p_mmu, &loading_pcb->memo_m.pgb, 1);
@@ -162,6 +173,7 @@ int loadNullPCB(struct mmu * p_mmu, struct pcb_str * loading_pcb){
     cpu_snapshot_init(&loading_pcb->s, 0);
 
     pm_write_word(p_mmu->ps, mmu_resolve(p_mmu,loading_pcb->memo_m.pgb,0), EXIT_CODE);
+    tlb_flush(p_mmu);
 }
 
 int __hexString2int32(char * hexString, uint32_t * intVal){

@@ -163,7 +163,7 @@ void disp_Dispatch(pcb_t * old_pcb, pcb_t * new_pcb, struct core_hari_s * cpu_co
         __disp_unload(cpu_core_hari, old_pcb);
         }
     else printf("NULL");
-
+    tlb_flush(&cpu_core_hari->mem_manag_unit);
     printf(" - NEW:");
     if(new_pcb != NULL) {
         printf("%d",new_pcb->pid);
@@ -176,6 +176,7 @@ void disp_Dispatch(pcb_t * old_pcb, pcb_t * new_pcb, struct core_hari_s * cpu_co
 void disp_Terminate(struct core_hari_s * cpu_core_hari, pcb_t * pcb){
     printf("DISPATHCHER: Process with %d PID terminated", pcb->pid);
     mmu_free(&cpu_core_hari->mem_manag_unit, pcb->memo_m.pgb);
+    assert(pcb->memo_m.pgb != 0);
     pcb_destroy(pcb);
 }
 

@@ -20,7 +20,7 @@ void *clk_clock_start(void *clk_mutex_s){
         }
         pthread_cond_broadcast(clk->cond_clk_ziklo);
         clk->tmr_kop_tick_consumed = 0;
-        sleep(1);
+        //sleep(1);
     }
     pthread_mutex_unlock(clk->mutex_clk);
 }

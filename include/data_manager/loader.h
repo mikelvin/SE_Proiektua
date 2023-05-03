@@ -6,7 +6,7 @@
 #include <scheduler_s.h>
 
 
-#define LOAD_DIR "/home/kilme/UNI/SE/sheduler_proj/data/pr_test/"
+#define LOAD_DIR "/home/kilme/UNI/SE/sheduler_proj/data/programlist02/"
 
 typedef struct loader_s {
     lnklist_LFRL unloaded_elf_list;
