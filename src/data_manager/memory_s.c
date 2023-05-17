@@ -139,7 +139,7 @@ int pm_m_frame_malloc_bulk(struct physycal_memory * ps, uint32_t frame_adress_ar
 */
 int pm_pt_page_table_malloc(struct physycal_memory * ps, uint32_t * adress,  uint32_t entries){
     struct free_block_search_args fb_args = {
-        .min_adress_kont = PAGETABLE_CORE_ADRESS_KOP + PAGETABLE_CORE_ADRESS_KOP*entries,
+        .min_adress_kont = PAGETABLE_CORE_ADRESS_KOP + PAGETABLE_CORE_ADRESS_KOP*entries, // MAL PAGETABLE_CORE_ADRESS_KOP?*entries
         .start_limit_adress = KERNEL_SPACE_START_ADDRESS,
         .end_limit_adress = KERNEL_SPACE_END_ADDRESS};
 
@@ -300,9 +300,10 @@ uint32_t mmu_resolve(struct mmu * p_mmu, uint32_t PTBR, uint32_t virt_adress){
         mmu_resolve_frame_rootadr_from_memo(p_mmu, &frame_adress, PTBR, virt_adress);
         tlb_add_entry(p_mmu,PTBR,virt_adress,frame_adress);
     }
-  
+    
+    uint32_t effective_address = frame_adress & ~(FRAME_OFSET_MASK) | (virt_adress & FRAME_OFSET_MASK);
 
-    return frame_adress & ~(FRAME_OFSET_MASK) | (virt_adress & FRAME_OFSET_MASK);
+    return effective_address;
 }
 
 int  mmu_resolve_frame_rootadr_from_memo(struct mmu * p_mmu, uint32_t * frame_adress, uint32_t PTBR, uint32_t virt_adress){
@@ -373,8 +374,8 @@ int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_s
 }
 
 int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop){
-    int frames_needed = word_kop/FRAME_SIZE;
-    if(word_kop % FRAME_SIZE){
+    int frames_needed = word_kop*4/FRAME_SIZE;
+    if(word_kop*4 % FRAME_SIZE){
         frames_needed++;
     }
     return pm_pt_page_table_malloc(target_mmu->ps, ptbr, frames_needed);
