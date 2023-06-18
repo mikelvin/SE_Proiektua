@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <executor.h>
+#include <lnklist_functionalities_s.h>
 
 #define LOADER_MAXTLB 10
 
@@ -57,7 +58,7 @@ int loader_startup(loader_s * loader, struct physycal_memory * pm, sched_basic_t
 
             char * file_full_path = concat(LOAD_DIR, dir->d_name);
 
-            printf("%s", file_full_path);
+            printf("%s; ", file_full_path);
             
             lnklst_LFRL_push(&loader->unloaded_elf_list, file_full_path);
         }
@@ -65,6 +66,7 @@ int loader_startup(loader_s * loader, struct physycal_memory * pm, sched_basic_t
     }
 
     MergeSort(&loader->unloaded_elf_list, strcmp);
+    printf("\n");
 
     return(0);
 }
@@ -76,7 +78,7 @@ int loader_loadNextProcess(loader_s * loader)
         return 0;
     }
 
-    struct pcb_str * curr_pcb = (struct pcb_str *) malloc(sizeof(struct pcb_str));
+    struct pcb_t * curr_pcb = (struct pcb_t *) malloc(sizeof(struct pcb_t));
     
     pcb_init(curr_pcb, __loader_getValidPid(loader), __loader_getValidPrio(loader));
 
@@ -95,7 +97,7 @@ int loader_loadNextProcess(loader_s * loader)
  * @param loading_pcb Kargatu nahi den PCB-a
  * @return int 
  */
-int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
+int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_t *loading_pcb)
  {
     FILE * fp;
     char * line = NULL;
@@ -128,7 +130,7 @@ int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
 
         if(i == 0){
             loading_pcb->memo_m.code = atoi(line) * 4;
-            loading_pcb->s.PC=loading_pcb->memo_m.code; // PCB-aren PC-a hasieratu kode helbidera
+            cpu_snapshot_init(&loading_pcb->s, loading_pcb->memo_m.code); // PCB-aren PC-a hasieratu kode helbidera
 
         }else{
             loading_pcb->memo_m.data = atoi(line) * 4;
@@ -162,7 +164,7 @@ int __load_file(struct mmu *p_mmu, char *d_name, struct pcb_str *loading_pcb)
  * @param loading_pcb 
  * @return int 
  */
-int loadNullPCB(struct mmu * p_mmu, struct pcb_str * loading_pcb){
+int loadNullPCB(struct mmu * p_mmu, struct pcb_t * loading_pcb){
     
     mmu_malloc(p_mmu, &loading_pcb->memo_m.pgb, 1);
     loading_pcb->memo_m.data = 0;

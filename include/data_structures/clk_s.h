@@ -15,6 +15,7 @@ struct clk_timer_s{
     void * tickActionParams;
     int tmr_status;
     int tick_count;
+    char * name;
 };
 typedef struct clk_timer_s clk_timer_s;
 
@@ -34,7 +35,7 @@ void *clk_clock_start(void *clk_struct);
 void clk_clock_init(clk_clock_s *clk_struct);
 
 void clk_timer_init(clk_timer_s *tmr_struct, clk_clock_s *clk_struct, 
-    int tmr_tick_freq, DoActionWhenTick tickaction, void * tickActionParams); // TODO:
+    int tmr_tick_freq, DoActionWhenTick tickaction, void * tickActionParams, char * name); // TODO:
 
 void clk_stop_timer(clk_timer_s *tmr_struct); // TODO:
 

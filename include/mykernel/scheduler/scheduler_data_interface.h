@@ -10,13 +10,13 @@
 #define MY_SCHED_RR 4
 
 
-struct s_i_sched { // Sruct_Interface_Scheduler
+struct s_i_sched { // Struct_Interface_Scheduler
     void * sched_data;
-    void    (* insert)  (void * sched, pcb_t * new_pcb);
-    void    (* init)    (void * sched);
-    pcb_t *  (* peek)    (void * sched);
-    pcb_t * (* out)     (void * sched);
-    char * (* print)     (void * sched); //TODO: Make print Function
+    void    (* insert)  (void * sched_data, pcb_t * new_pcb);
+    void    (* init)    (void * sched_data);
+    pcb_t *  (* peek)    (void * sched_data);
+    pcb_t * (* out)     (void * sched_data);
+    char * (* print)     (void * sched_data);
 };
 typedef  struct s_i_sched  s_i_sched;
 
@@ -36,6 +36,6 @@ void i_schedImplement(
     char * (* print) (void * sched_data)
     );
 
-void i_schedStartup(s_i_sched * ifaceo, int POLICY);// TODO: Change name to: i_schedConfigure
+void i_schedConfigure(s_i_sched * ifaceo, int POLICY);
 
 #endif

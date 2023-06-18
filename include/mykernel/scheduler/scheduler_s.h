@@ -18,37 +18,31 @@
 typedef struct sched_egitura sched_basic_t;
 
 struct sched_egitura {
-    pthread_mutex_t * sched_mutex_list;
+    pthread_mutex_t * sched_mutex_list; //Prozesuen lista era konkurrentean ez atzitzeko mutex-a. Prozesuen interfazeko PCB-ak gordetzen dituzten datu egituren integritatearen babes bezala jokatzen du.
 
-    int current_politika; 
-    s_i_sched scheduler_queue_iface_object;
+    int current_politika; // Scheduler-ean kargatutako politikaren kodea gordetzen duen elementua.
+    s_i_sched scheduler_queue_iface_object; //Scheduler interfaze objektua. Bertan PCB-ak manipulatzeko funtzioak eta datu egiturak eurkituko dira.
 
-    pcb_t * current_running_process; //TODO: Eliminar
+    pcb_t null_process; //Null process-aren PCB-a. Prozesu baliagarririk ez dagoenean CPU harían kargatuko den prozesua.
 
-    int current_sched_status;
+    clk_timer_s * timer; //Proiektuaren lehenengo zatian diseinatutako timer objektua. Quantum dekrementazioaren indizea lortzeko erabiliko da. Timer hau, scheduler-aren akribazioa kudetuko duen timer-a izan beharko da.
 
-    pcb_t null_process;
-
-    // FOR: Quantum bidezko kanporaketa
-    clk_timer_s * timer;
-    int default_process_quantum;
-
-    struct sched_cpuThreadControl ** coreControl_array;
-    int coreControl_arr_len;
+    struct sched_cpuThreadControl ** coreControl_array; //Core hari guztien egoerak kontrolatzen dituzten objektuen array-a.
+    int coreControl_arr_len; // "coreControl_array" array-aren luzeera.
     
 };
 
 struct sched_cpuThreadControl{
-    struct core_hari_s * core_hari_s;
-    pcb_t * current_running_process;
-    int cur_process_quantum;
-    int current_cpu_SchedStatus;
+    struct core_hari_s * core_hari_s;   // Kontrolatuko den CPU hariaren erreferentzia
+    pcb_t * current_running_process;    // CPU harian, une horretan exekutatzen hari den prozesuaren PCB-a.
+    int cur_process_quantum;            // Une honetan exekutatzen hari den prozesuaren quantum-a. Balio honek, prozesuari geratzen zaion quantum denbora adieraziko du.
+    int current_cpu_SchedStatus;        // CPU hariaren egoera adierazten duen aldagaia. Null prozesua exekutatzen ari den ala ez adierazteko erabiliko da gehienbat.
 };
 
 void sched_AddToProcessQueue(sched_basic_t * sched, pcb_t * new_pcb);
 void sched_execute(sched_basic_t * sched);
 void sched_Scheduler_Dispatcher(sched_basic_t * sched, struct sched_cpuThreadControl * thr_control);
-pcb_t * sched_GetNextFromProcessQueue(sched_basic_t * sched);
+pcb_t * __sched_GetNextFromProcessQueue(sched_basic_t * sched);
 
 void sched_init(sched_basic_t *sched, clk_timer_s *timer, struct cpu_s my_cpu_arr[], int cpu_kop, int SCHED_POLITIKA);
 

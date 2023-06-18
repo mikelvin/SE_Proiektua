@@ -46,10 +46,4 @@ int hari_t_init(struct core_hari_s * p_hari, struct physycal_memory * ps);
  */
 int get_hari_kop(struct cpu_s * p_cpu, int * hari_kop);
 
-uint32_t core_resolve(struct core_hari_s * core_h, uint32_t virt_adress);
-
-uint32_t core_execute(struct core_hari_s * core_h);
-
-uint32_t core_execute_agindu(struct core_hari_s * core_h, uint32_t agindu_value);
-
 #endif

@@ -36,7 +36,7 @@ char * i_sched_print(s_i_sched * sched){
     sched->print(sched->sched_data);
 };
 
-void  i_schedStartup(s_i_sched * ifaceo, int POLICY){
+void  i_schedConfigure(s_i_sched * ifaceo, int POLICY){
     switch (POLICY)
     {
     case MY_SCHED_PRIO_RR:

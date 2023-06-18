@@ -121,7 +121,7 @@ int  mmu_resolve_frame_rootadr_from_memo(struct mmu * p_mmu, uint32_t * frame_ad
 // 
 
 int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop);
-int mmu_free(struct mmu * target_mmu, uint32_t * ptbr);
+int mmu_free(struct mmu * target_mmu, uint32_t ptbr);
 int mmu_init(struct mmu * target_mmu, struct physycal_memory * pm, int max_tlb_space);
 
 

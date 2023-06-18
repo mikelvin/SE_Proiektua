@@ -90,7 +90,7 @@ int pm_m_frame_malloc(struct physycal_memory * ps, uint32_t * adress){
     uint32_t resulting_adress;
     
     if( ! pm_memory_allocation_request(ps, &fb_args, &resulting_adress)){
-        err(1, "Not enough free space for table allocation");
+        err(1, "Not enough free space for frame allocation");
         return 0;
     };
     *adress = resulting_adress;
@@ -381,7 +381,7 @@ int mmu_malloc(struct mmu * target_mmu, uint32_t * ptbr, int32_t word_kop){
     return pm_pt_page_table_malloc(target_mmu->ps, ptbr, frames_needed);
 }
 
-int mmu_free(struct mmu * target_mmu, uint32_t * ptbr){
+int mmu_free(struct mmu * target_mmu, uint32_t ptbr){
     pm_pt_page_table_free(target_mmu->ps, ptbr);
     
 }

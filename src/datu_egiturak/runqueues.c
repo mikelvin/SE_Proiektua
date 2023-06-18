@@ -17,19 +17,7 @@ void runqueue_init(rt_runqueue * runq){
 
 };  
 
-// Get list giving a priority
-lnklist_LFRL * rt_priarr_getList(rt_prio_array rt_priarr, int prio){
-    
-};
-
-int rt_priarr_getListLength(rt_prio_array rt_priarr, int prio){
-    lnklist_LFRL * prio_list ;
-    prio_list = rt_priarr_getList(rt_priarr, prio);
-    return prio_list->len;
-};
-
 void simple_runqueue_init(rt_simple_runqueue * runq){
     lnklst_LFRL_init(&runq->active);
     runq->nr_running = 0;
-    
 }

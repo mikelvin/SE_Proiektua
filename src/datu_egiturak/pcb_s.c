@@ -1,4 +1,5 @@
 #include <pcb_s.h>
+#include <stdlib.h>
 
 void pcb_init(pcb_t * pcb, int pid, int current_prio){
     pcb->pid = pid;
@@ -7,10 +8,6 @@ void pcb_init(pcb_t * pcb, int pid, int current_prio){
 }
 void pcb_destroy(pcb_t *pcb){
     free(pcb);
-};
-
-int pcb_getStatus(pcb_t * pcb){
-    return pcb->curr_prio;
 };
 
 int mm_init(struct mm * p_mm, uint32_t pgb, uint32_t code_virt_adress, uint32_t data_virt_adress){

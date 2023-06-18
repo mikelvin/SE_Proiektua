@@ -23,8 +23,7 @@ struct cpu_snapshot
     int32_t cc;
 };
 
-
-struct pcb_str {
+struct pcb_t {
     int pid;
     int curr_prio;
     int status;
@@ -32,7 +31,7 @@ struct pcb_str {
     struct cpu_snapshot s;
 };
 
-typedef struct pcb_str pcb_t;
+typedef struct pcb_t pcb_t;
 
 int mm_init(struct mm * p_mm, uint32_t pgb, uint32_t code_virt_adress, uint32_t data_virt_adress);
 
@@ -40,7 +39,5 @@ void pcb_init(pcb_t * pcb, int pid, int current_prio);
 void pcb_destroy(pcb_t * pcb);
 
 void cpu_snapshot_init(struct cpu_snapshot * cs, uint32_t PC);
-
-int pcb_getStatus(pcb_t * pcb);
 
 #endif 

@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int _rq_PRIO_FIFO_updateSched(rt_runqueue * sched);
 int getFirstNotEmptyListIndex(lnklist_LFRL arr[]); // TODO: Move to runqueues_s.h
 
 /*

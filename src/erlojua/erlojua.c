@@ -38,11 +38,14 @@ void *clk_timer_start(void *p_timer_s){
 
     while(tmr->tmr_status != CLK_STATUS_TERMINATE){
         tmr->tick_count -= 1;
-        printf("TMR_f%d: count %d \n",tmr->tmr_tick_freq, tmr->tick_count);
+        printf("TMR - %s: freq %d ; count %d > ",tmr->name,tmr->tmr_tick_freq, tmr->tick_count);
         
         if (tmr->tick_count <= 0){
+            printf("FIRE\n");
             tmr->TickAction(tmr->tickActionParams);
             tmr->tick_count = tmr->tmr_tick_freq;
+        }else{
+            printf("WAIT\n");
         }
         t_clk->tmr_kop_tick_consumed++;
         pthread_cond_signal(t_clk->cond_tmr_arreta);
@@ -70,13 +73,14 @@ void clk_clock_init(clk_clock_s * clk_struct){
     clk_struct->clk_status = CLK_STATUS_RUNNING;
 }
 
-void clk_timer_init(clk_timer_s *tmr_struct, clk_clock_s *clk_struct, int tmr_tick_freq, DoActionWhenTick tickaction, void * tickActionParams){
+void clk_timer_init(clk_timer_s *tmr_struct, clk_clock_s *clk_struct, int tmr_tick_freq, DoActionWhenTick tickaction, void * tickActionParams, char * name){
     tmr_struct->linked_clk = clk_struct;
     tmr_struct->tmr_tick_freq = tmr_tick_freq;
     tmr_struct->TickAction = tickaction;
     tmr_struct->tickActionParams = tickActionParams;
     tmr_struct->tmr_status = CLK_STATUS_RUNNING;
     tmr_struct->tick_count = 0;
+    tmr_struct->name = name;
 }
 
 void clk_stop_timer(clk_timer_s *tmr_struct){

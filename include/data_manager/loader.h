@@ -6,7 +6,7 @@
 #include <scheduler_s.h>
 
 
-#define LOAD_DIR "/home/kilme/UNI/SE/sheduler_proj/data/programlist02/"
+#define LOAD_DIR "./data/programlist/"
 
 typedef struct loader_s {
     lnklist_LFRL unloaded_elf_list;
@@ -27,9 +27,9 @@ int loader_loadNextProcess(loader_s * loader);
     LOAD_DIR konstantean definituta dagoen direktorioan dagoen programa guztien path-ak biltzen ditu ondoren 
     
 */
-int __load_file(struct mmu * p_mmu, char * d_name, struct pcb_str * loading_pcb);
+int __load_file(struct mmu * p_mmu, char * d_name, struct pcb_t * loading_pcb);
 
-int loadNullPCB(struct mmu * p_mmu, struct pcb_str * loading_pcb);
+int loadNullPCB(struct mmu * p_mmu, struct pcb_t * loading_pcb);
 
 /**
  * @brief 8 karaktereko String batean kodetuta dauden 4 byteko (32bit) hitzaren uint32 balioa jaso
